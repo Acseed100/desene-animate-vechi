@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartoon Library</title>
+<style>
+body {margin:0;padding:20px;font-family:Arial;background:#111;color:#fff;}
+h1{text-align:center;margin-bottom:20px;}
+
+/* Cartoon list */
+.cartoon{padding:15px;margin-bottom:10px;background:#1e1e1e;border-radius:8px;cursor:pointer;border:1px solid #333;}
+
+/* Modal background */
+#episode-modal-bg {
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.85);
+  justify-content:center;
+  align-items:flex-start;
+  z-index:20;
+  padding:0;
+}
+
+/* Modal container */
+#episode-modal {
+  background:#1b1b1b;
+  width:95%;
+  max-width:500px;
+  border-radius:10px;
+  margin:20px auto;
+  display:flex;
+  flex-direction:column;
+  max-height:90vh;
+}
+
+/* Modal header with close button */
+#modal-header {
+  padding:15px;
+  font-size:18px;
+  font-weight:bold;
+  border-bottom:1px solid #333;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+#episode-list {
+  overflow-y:auto;
+  padding:10px;
+  flex:1;
+}
+
+/* Episode buttons */
+.ep-btn{display:inline-block;padding:10px 15px;margin:5px;background:#2c2c2c;border-radius:6px;cursor:pointer;border:1px solid #444;}
+
+/* Video overlay */
+#video-overlay-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);justify-content:center;align-items:center;z-index:30;padding:10px;}
+#video-box{width:100%;max-width:600px;}
+#video-box iframe{width:100%;height:320px;border-radius:8px;border:none;}
+#close-video{margin-top:10px;background:#444;padding:10px;text-align:center;border-radius:6px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<h1>Cartoon Library</h1>
+<div id="cartoon-list"></div>
+
+<!-- Modal Episoade -->
+<div id="episode-modal-bg">
+  <div id="episode-modal">
+    <div id="modal-header">
+      <span id="modal-title"></span>
+      <div class="close-btn" onclick="closeEpisodeModal()">X</div>
+    </div>
+    <div id="episode-list"></div>
+  </div>
+</div>
+
+<!-- Overlay Video -->
+<div id="video-overlay-bg">
+  <div id="video-box">
+    <iframe id="video-frame"></iframe>
+    <div id="close-video" onclick="closeVideo()">Close Video</div>
+  </div>
+</div>
+
+<script>
+// Încarcă JSON-ul generat de Node.js
+fetch('cartoons_generated.json')
+  .then(res=>res.json())
+  .then(data=>{
+    const cartoonList = document.getElementById('cartoon-list');
+    data.cartoons.forEach(c=>{
+      const div = document.createElement('div');
+      div.className='cartoon';
+      div.innerText=c.name;
+      div.onclick=()=>openEpisodes(c);
+      cartoonList.appendChild(div);
+    });
+  });
+
+function openEpisodes(cartoon){
+  document.getElementById('modal-title').innerText = cartoon.name;
+  const epList = document.getElementById('episode-list');
+  epList.innerHTML = '';
+  cartoon.episodes.forEach(ep=>{
+    const b = document.createElement('div');
+    b.className='ep-btn';
+    b.innerText = 'Ep. '+ep.ep;
+    b.onclick = ()=>openVideo(ep.link);
+    epList.appendChild(b);
+  });
+  document.getElementById('episode-modal-bg').style.display='flex';
+}
+
+function closeEpisodeModal(){
+  document.getElementById('episode-modal-bg').style.display='none';
+}
+
+function openVideo(link){
+  document.getElementById('video-frame').src = link;
+  document.getElementById('video-overlay-bg').style.display='flex';
+}
+
+function closeVideo(){
+  document.getElementById('video-overlay-bg').style.display='none';
+  document.getElementById('video-frame').src='';
+}
+</script>
+
+</body>
+</html>
