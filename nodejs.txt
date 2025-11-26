@@ -1,0 +1,4 @@
+cd /storage/emulated/0/Download/website
+ls
+
+node generateJSON.js
