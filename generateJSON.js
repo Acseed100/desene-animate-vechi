@@ -43,12 +43,34 @@ async function main() {
 
     const episodes = files
       .map(f => {
-        const epNum = parseInt(f.name.replace(/\.mp4$/i, '').trim());
-        if (isNaN(epNum)) return null;
-        return { ep: epNum, link: `https://drive.google.com/file/d/${f.id}/preview` };
+        const nameWithoutExt = f.name.replace(/\.mp4$/i, '').trim();
+
+        let epNum = null;
+        let title = '';
+
+        // Caz 1: începe cu număr și eventual titlu: 1 sau 1. Titlu
+        const match1 = nameWithoutExt.match(/^(\d+)(?:\.\s*(.*))?$/);
+        if (match1) {
+          epNum = parseInt(match1[1]);
+          title = match1[2] ? match1[2] : `Ep. ${epNum}`;
+        } else {
+          // Caz 2: nu începe cu număr, doar titlu
+          epNum = null;
+          title = nameWithoutExt; 
+        }
+
+        const link = `https://drive.google.com/file/d/${f.id}/preview`;
+
+        return { ep: epNum, title, link };
       })
       .filter(f => f !== null)
-      .sort((a,b) => a.ep - b.ep);
+      .sort((a,b) => {
+        // sortăm după număr dacă există, altfel rămâne la sfârșit
+        if (a.ep !== null && b.ep !== null) return a.ep - b.ep;
+        if (a.ep !== null) return -1;
+        if (b.ep !== null) return 1;
+        return 0;
+      });
 
     output.cartoons.push({ name: c.name, episodes });
   }
