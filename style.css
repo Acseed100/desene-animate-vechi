@@ -99,6 +99,8 @@ h1 {
 #episode-list {
     overflow-y: auto;
     padding: 15px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
 }
 
 .ep-btn {
